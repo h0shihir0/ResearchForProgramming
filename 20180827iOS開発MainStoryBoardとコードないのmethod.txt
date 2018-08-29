@@ -1,0 +1,19 @@
+<UIとメソッドの新しい結び付け方>
+
+ー今までー
+
+MainStoryBoardから矢印を引っ張ってきて、そこから対応する変数を結び付けていた
+
+ー新しいやり方ー
+
+例えば,slIOというUIがあり、それのスライダーの編集時の動作に動きを加えたい時
+
+///.hファイルでは以下のように
+@property (nonatomic, retain) IBOutlet UISlider *slISO;
+
+///.mファイルでは以下のようにsliderISOChangedメソッドをイベントとして入れることができる
+[self.slISO addTarget:self
+                    action:@selector(sliderISOChanged:)
+          forControlEvents:UIControlEventValueChanged];
+
+

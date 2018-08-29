@@ -1,0 +1,3 @@
+< Gitで他のパソコンでのSourceTreeの内容が反映されない時>
+
+・fetchしてpullしよう！！！

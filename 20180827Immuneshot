@@ -1,0 +1,143 @@
+Immuneshot の改良点
+
+① SlgA濃度の値が違う⇨ シャッター音の時の明るさが変化してしまうという問題
+			⇨　頻度は１０回に２回から０回
+			⇨　誤差は10%ぐらい出てしまう
+	仮設①　CameraViewController 470行目
+
+if(exposureTargetBias == 0){	//デフォルトで0が入っているので、ここはtrue
+        // バイアスの中間値を計算して結果を変数に代入
+        exposureTargetBias = (captureDevice.maxExposureTargetBias + captureDevice.minExposureTargetBias) / 2;
+    }
+    	
+	//captureDeviceは　AVCaptureDeviceクラス
+
+	このexposureTargetBais(float)は519行目で使われている
+	
+	[captureDevice setExposureTargetBias:exposureTargetBias completionHandler:nil];
+	
+	//setExposureTargetBiasメソッド(露出度を設定してくれるメソッド)をexposureTargetBiasという変数を引数に入れている
+
+	⇨　しかし、誤差20%ぐらい出た時にexposureTargetBiasの値は変わらなかったので、ここは関係ないことがわかった
+
+	仮設②  lblResult(ResultViewController)に記される結果の値から逆算して考えてみる
+	
+	このGUIには valueTotalという変数が入っている
+	
+	ResultVeiwController 184 行目には以下のような記述がなされている
+
+	double valueTotal = valueCon / valueA  -  valueB / valueA;
+			
+	/////
+	
+	valueCon、valueA、valueBの値はそれぞれCONENTRATION、ValueA、ValueBというKeyを使って保存したデータを読んでいる
+	また、この全てのデータはCameraViewControllerで保存されている
+	ValueA、ValueBというKeyは最初の設定値のこと
+	
+	残りの一つは以下のように設定されている (CameraController内)
+	
+	[defaults setInteger:conentration forKey:@"CONENTRATION"]; // 822行目
+
+	int conentration = [self culcRank:lumi_minc_ave]; //820行目
+
+	lumi_minc_ave = lumi_minc_ave*1000; //815行目
+
+	lumi_minc_ave = 1.0 - tmp_ave/lumi_ave_count; //732行目
+
+	///このlumi_minc_aveには1.0というデフォルト値が665行目で入れられてiru
+
+	///725行目から729行目
+
+	float tmp_ave=0.0;
+            for(int i=0; i<lumi_ave_count; i++){
+                tmp_ave += [[lumi_high_arr objectAtIndex:i] floatValue];
+                NSLog(@"value_cal_data=%f", [[lumi_high_arr objectAtIndex:i] floatValue]);
+            }
+            
+	///このlumi_high_arrには何が入っているのという問題
+
+	///とりあえず,671行目から675行目まで以下のように初期化されている
+	
+	 int lumi_ave_count = 10;
+            NSMutableArray *lumi_high_arr = [NSMutableArray array];
+            for(int i=0; i<lumi_ave_count; i++){
+                [lumi_high_arr addObject:[NSNumber numberWithFloat:1.0]];
+            }
+
+	///696行目から702行目まで以下のように実質値が入っている
+	
+	for(int k=0; k<lumi_ave_count; k++){
+                        if(tmp<=[[lumi_high_arr objectAtIndex:k] floatValue]){
+                            [lumi_high_arr insertObject:[NSNumber numberWithFloat:tmp] atIndex:k];
+                            [lumi_high_arr removeLastObject];
+                            break;
+                        }
+                    }
+
+	///とりあえずtmpに入っているものを入れまくっているっぽい
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
